@@ -1,0 +1,146 @@
+name: Daily AI Video Generation
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  generate-videos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Create credential files
+      run: |
+        echo '${{ secrets.GOOGLE_SHEETS_CREDS }}' > sheets_creds.json
+        echo '${{ secrets.YOUTUBE_CREDS }}' > youtube_creds.json
+    
+    - name: Run video generation pipeline
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+      run: python main.py
+    
+    - name: Upload execution logs
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: pipeline-logs
+        retention-days: 7
+```
+
+### Paste it in text area
+
+### Click "Commit new file"
+
+✅ **Done!** Workflow created.
+
+---
+
+## **STEP 4: Create .gitignore File**
+
+1. **Click "Add file"** → **"Create new file"**
+
+### Type filename:
+```
+.gitignore
+```
+
+### Copy this:
+```
+# Credentials
+sheets_creds.json
+youtube_creds.json
+*.pem
+*.key
+
+# Videos
+*.mp4
+*.avi
+*.mov
+
+# Python
+__pycache__/
+*.py[cod]
+.Python
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+```
+
+### Paste and click "Commit new file"
+
+✅ **Done!** All files uploaded.
+
+---
+
+## 🎉 What Your Repository Should Look Like Now:
+
+When you go to your main repository page, you should see:
+```
+📁 .github/
+   └── 📁 workflows/
+       └── 📄 daily-video.yml
+📄 .gitignore
+📄 README.md
+📄 main.py
+📄 requirements.txt
+```
+
+---
+
+## 🎬 Visual Guide:
+
+**Where you are:**
+```
+https://github.com/YOUR_USERNAME/ai-video-automation
+```
+
+**What you see:**
+- List of files
+- Green "Code" button
+- **"Add file" button** ← This is what you click!
+
+**After clicking "Add file":**
+- You see two options:
+  - "Create new file" ← Click this
+  - "Upload files" (don't use this)
+
+**After clicking "Create new file":**
+```
+┌─────────────────────────────────────┐
+│ Name your file...  [___________]    │  ← Type filename here
+├─────────────────────────────────────┤
+│                                      │
+│  [Large empty text box]              │  ← Paste code here
+│                                      │
+│                                      │
+└─────────────────────────────────────┘
+
+[Cancel]  [Commit new file]  ← Click this green button
